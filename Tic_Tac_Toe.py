@@ -176,17 +176,26 @@ def info_box():
     text_box.center = (int(screen_x*0.5),int(screen_y*0.040))
     screen.blit(text, text_box)
 def menu_screen():
-    global menu, start
+    global menu, start, single_player
     start = False
+    font = pygame.font.SysFont('Calibri', int(screen_y*0.06))
+    text_rectangle_0 = pygame.draw.rect(screen, black, (int(screen_x*0.30),int(screen_y*0.26),screen_x*0.40,int(screen_y*0.08)))
+    text_0 = font.render('Single Player', True, white, black)
+    text_box_0 = text_0.get_rect()
+    text_box_0.center = (int(screen_x*0.5),int(screen_y*0.3))
+    screen.blit(text_0, text_box_0)
 
-    if event.type == MOUSEBUTTONDOWN:
-        mouse_position = pygame.mouse.get_pos()
+    text_rectangle_1 = pygame.draw.rect(screen, black, (int(screen_x*0.30),int(screen_y*0.56),screen_x*0.40,int(screen_y*0.08)))
+    text_1 = font.render('Multi Player', True, white, black)
+    text_box_1 = text_1.get_rect()
+    text_box_1.center = (int(screen_x*0.5),int(screen_y*0.6))
+    screen.blit(text_1, text_box_1)
+
+    if text_rectangle_1.collidepoint(mouse_position):
         single_player = True
-        if single_player == True:
-            menu = False
-            start = True
-    if event.type == MOUSEBUTTONUP:
-        pygame.time.wait(3000)
+    if single_player == True:
+        menu = False
+        start = True
             
 
 
@@ -210,10 +219,6 @@ o_img_int = pygame.image.load('O.png')
 
 
 running = True
-red_box = False
-start = (0, 0)
-size = (0, 0)
-drawing = False
 screen_x = screen_size[0]
 screen_y = screen_size[1]
 line_a = int(screen_x/3)
@@ -225,39 +230,87 @@ for i in range(3):
     for n in range(3):
         board[str(i) + '_' + str(n)] = None
 turn = randint(0, 1) # 0 = circle; 1 = X
-
+mouse_position = (0,0)
 menu = True
 gameover = False
 end_message = None
 ticks = pygame.time.get_ticks()
 menu_goal_ticks = 0
 menu_wait = False
+click = None
+box_click = False
+single_player = False
 while running:
     ticks = pygame.time.get_ticks()
+    screen.fill(background)
+    if menu == True:
+        menu_screen()
+    if start == True:
+        line_a = int(screen_x/3)
+        line_b = int((screen_x/3)*2)
+        line_c = int(((screen_y*0.92)/3)+(screen_y*0.08))
+        line_d = int((screen_y*0.92/3)*2+(screen_y*0.08))
+        lines = []
+        line_letters = ['a','b','c','d']
+        for i in range(len(line_letters)):
+            lines.append(globals()['line_'+line_letters[i]])
+        info_box()
+        board_setup(lines)
+        if box_click == True:
+            board = board_modification(board, mouse_position, lines)
+            box_click = False
+        if line_a < line_c:
+            line  = line_a
+        else:
+            line = line_c
+        o_img = pygame.transform.smoothscale(o_img_int, (int(line*0.65), int(line*0.65)))
+        x_img = pygame.transform.smoothscale(x_img_int, (int(line*0.6), int(line*0.6)))
+        board_draw(board) # draws the x and o on the board
+        
+        if(board['0_0'] == 0 and board['0_1'] == 0 and board['0_2'] == 0):
+            gameover = True
+    
+        if(gameover == True):
+            gameover = False
+            board = reset_board()
+
+        if not(any(n is None for n in board.values())):
+            end_message = 'It\'s a Draw'
+            info_box()
+            pygame.display.update()
+            if menu_wait == False:
+                menu_wait = True
+                menu_goal_ticks = ticks + 2000
+        if (menu_wait == True) and (ticks >= menu_goal_ticks):
+            menu_wait = False
+            single_player = False
+            menu_goal_ticks = 0
+            end_message = None
+            board = reset_board()
+            menu = True
+            start = False
+
+
+
+
+    pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         print(event)
         pygame.display.set_caption('Tic Tac Toe')
-        screen.fill(background)
+        
         if event.type == VIDEORESIZE:
             screen_size = event.size
             screen  = pygame.display.set_mode(screen_size, RESIZABLE)
             screen_x = screen_size[0]
             screen_y = screen_size[1]
         if menu == True:
-            menu_screen()
+            if event.type == MOUSEBUTTONUP:
+                mouse_position = pygame.mouse.get_pos()
+
+                #single_player = True
         if start == True:
-            
-            line_a = int(screen_x/3)
-            line_b = int((screen_x/3)*2)
-            line_c = int(((screen_y*0.92)/3)+(screen_y*0.08))
-            line_d = int((screen_y*0.92/3)*2+(screen_y*0.08))
-            lines = []
-            line_letters = ['a','b','c','d']
-            for i in range(len(line_letters)):
-                lines.append(globals()['line_'+line_letters[i]])
-            info_box()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_g:
                     background = green
@@ -266,49 +319,9 @@ while running:
                 elif event.key == pygame.K_r:
                     board = reset_board()
                     turn = randint(0, 1)
-                
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_position = pygame.mouse.get_pos()
-                board = board_modification(board, mouse_position, lines)
-
-            board_setup(lines)
-            
-
-            if line_a < line_c:
-                line  = line_a
-            else:
-                line = line_c
-            o_img = pygame.transform.smoothscale(o_img_int, (int(line*0.65), int(line*0.65)))
-            x_img = pygame.transform.smoothscale(x_img_int, (int(line*0.6), int(line*0.6)))
-            board_draw(board) # draws the x and o on the board
-
-            if(board['0_0'] == 0 and board['0_1'] == 0 and board['0_2'] == 0):
-                gameover = True
-    
-            if(gameover == True):
-                gameover = False
-                board = reset_board()
-
-            if not(any(n is None for n in board.values())):
-                end_message = 'It\'s a Draw'
-                info_box()
-                pygame.display.update()
-                menu_wait = True
-                menu_goal_ticks = ticks + 2000
-    
-
-            
-        
-
-        
-        pygame.display.update()
-    if menu_wait == True and (menu_goal_ticks - ticks <= 0):
-        menu_wait = False
-        menu_goal_ticks = 0
-        end_message = None
-        board = reset_board()
-        #menu = True
-        #start = False
-
+                box_click = True
+                
 pygame.quit()
 
