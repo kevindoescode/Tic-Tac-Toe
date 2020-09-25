@@ -177,28 +177,28 @@ def info_box():
     text_box.center = (int(screen_x*0.5),int(screen_y*0.040))
     screen.blit(text, text_box)
 def menu_screen():
-    global menu, start, single_player
+    global menu, start, single_player, multi_player
     start = False
     if screen_x < screen_y: 
         smallest_screen_value = screen_x
     else:
         smallest_screen_value = screen_y
-    font = pygame.font.SysFont('Calibri', int(smallest_screen_value*0.06))
-    text_rectangle_0 = pygame.draw.rect(screen, black, (int(screen_x*0.30),int(screen_y*0.26),int(screen_x*0.40),int(screen_y*0.08)))
+    font = pygame.font.SysFont('Calibri', int(smallest_screen_value*0.08))
+    text_rectangle_0 = pygame.draw.rect(screen, black, (int(screen_x*0.25),int(screen_y*0.24),int(screen_x*0.50),int(screen_y*0.12)))
     text_0 = font.render('Single Player', True, white, black)
     text_box_0 = text_0.get_rect()
     text_box_0.center = (int(screen_x*0.5),int(screen_y*0.3))
     screen.blit(text_0, text_box_0)
 
-    text_rectangle_1 = pygame.draw.rect(screen, black, (int(screen_x*0.30),int(screen_y*0.56),int(screen_x*0.40),int(screen_y*0.08)))
+    text_rectangle_1 = pygame.draw.rect(screen, black, (int(screen_x*0.25),int(screen_y*0.54),int(screen_x*0.50),int(screen_y*0.12)))
     text_1 = font.render('Multi Player', True, white, black)
     text_box_1 = text_1.get_rect()
     text_box_1.center = (int(screen_x*0.5),int(screen_y*0.6))
     screen.blit(text_1, text_box_1)
 
     if text_rectangle_1.collidepoint(mouse_position):
-        single_player = True
-    if single_player == True:
+        multi_player = True
+    if multi_player == True:
         menu = False
         start = True
 def win_lines(board):
@@ -302,7 +302,7 @@ def win_lines(board):
             pygame.draw.aaline(screen, red, (x1,y1-i),(x2,y2-i))
         gameover()
 def gameover():
-    global board, menu_wait, goal_ticks, game_end, end_message, box_click, end_option, draw
+    global board, menu_wait, goal_ticks, game_end, end_message, box_click, end_option, draw, menu, start, single_player, multi_player
     if(game_end == False):
         game_end = True
     info_box()
@@ -317,23 +317,42 @@ def gameover():
     text_box_0.center = (int(screen_x*0.5),int(screen_y*0.4))
     screen.blit(text_0, text_box_0)
 
+    text_rectangle_1 = pygame.draw.rect(screen, black, (int(screen_x*0.25),int(screen_y*0.64),int(screen_x*0.50),int(screen_y*0.12)))
+    text_1 = font.render('Main Menu', True, white, black)
+    text_box_1 = text_1.get_rect()
+    text_box_1.center = (int(screen_x*0.5),int(screen_y*0.7))
+    screen.blit(text_1, text_box_1)
+
     if text_rectangle_0.collidepoint(mouse_position):
         end_option = 'continue'
+    elif text_rectangle_1.collidepoint(mouse_position):
+        end_option = 'mainmenu'
     if end_option == 'continue':
         end_message = None
         board = reset_board()
         end_option = None
         game_end = False
-        wait_completed = False
         box_click = False
         if draw == True:
             draw = False
+    elif end_option == 'mainmenu':
+        single_player = False
+        multi_player = False
+        start = False
+        menu = True
+        end_message = None
+        end_option = None
+        game_end = False
+        box_click = False
+        if draw == True:
+            draw = False
+        board = reset_board()
+        
 def wait(goal_ticks):
     wait_completed = False
     if ticks >= goal_ticks:
         wait_completed = True
     return wait_completed
-
 
 pygame.init()
 
@@ -369,13 +388,11 @@ turn = randint(0, 1) # 0 = circle; 1 = X
 mouse_position = (0,0)
 menu = True
 end_message = None
-ticks = pygame.time.get_ticks()
-menu_goal_ticks = 0
-menu_wait = False
 click = None
 game_end = False
 box_click = False
 single_player = False
+multi_player = False
 end_option = None
 game_end = False
 draw = False
@@ -413,16 +430,6 @@ while running:
         if draw == True:
             end_message = 'It\'s a Draw'
             gameover()
-        if (menu_wait == True) and (ticks >= menu_goal_ticks):
-            menu_wait = False
-            single_player = False
-            menu_goal_ticks = 0
-            end_message = None
-            board = reset_board()
-            menu = True
-            start = False
-            game_end = False
-
 
 
 
