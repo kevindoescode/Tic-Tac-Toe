@@ -1,4 +1,5 @@
 import sys, pygame, random
+from bot import bot_move
 from pygame.locals import *
 import pygame.gfxdraw
 from random import randint
@@ -166,18 +167,23 @@ def board_modification(board, mouse_position, lines):
 def info_box():
     text_rectangle = pygame.draw.rect(screen, black, (0,0,screen_x,int(screen_y*0.08)))
     font = pygame.font.SysFont('Calibri', int(screen_y*0.06))
-    if turn == 0:
-        message = 'O\'s turn'
-    if turn == 1:
-        message = 'X\'s turn'
-    if end_message != None:
-        message = end_message
+    if multi_player == True:
+        if turn == 0:
+            message = 'O\'s turn'
+        if turn == 1:
+            message = 'X\'s turn'
+        if end_message != None:
+            message = end_message
+    if single_player == True:
+        message = 'Your Turn'
+        if end_message != None:
+            message = end_message
     text = font.render(message, True, white, black)
     text_box = text.get_rect()
     text_box.center = (int(screen_x*0.5),int(screen_y*0.040))
     screen.blit(text, text_box)
 def menu_screen():
-    global menu, start, single_player, multi_player
+    global menu, start, single_player, multi_player, click
     start = False
     if screen_x < screen_y: 
         smallest_screen_value = screen_x
@@ -196,38 +202,45 @@ def menu_screen():
     text_box_1.center = (int(screen_x*0.5),int(screen_y*0.6))
     screen.blit(text_1, text_box_1)
 
-    if text_rectangle_1.collidepoint(mouse_position):
+    if text_rectangle_0.collidepoint(mouse_position) and click == True:
+        single_player = True
+        click = False
+    if text_rectangle_1.collidepoint(mouse_position) and click == True:
         multi_player = True
+        click = False
+    if single_player == True:
+        menu = False
+        start = True
     if multi_player == True:
         menu = False
         start = True
 def win_lines(board):
-    global end_message
+    global end_message, player_symbol, game_end
     if(board['0_0'] == 0 and board['0_1'] == 0 and board['0_2'] == 0):
         end_message = 'O Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_c*0.5+screen_y*0.0375)), (int(screen_x-screen_x*0.025),int(line_c*0.5+screen_y*0.0375)), 9)
-        gameover()
     if(board['1_0'] == 0 and board['1_1'] == 0 and board['1_2'] == 0):
         end_message = 'O Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_c+(line_c*0.5-screen_y*0.0425))), (int(screen_x-screen_x*0.025),int(line_c+(line_c*0.5-screen_y*0.0425))), 9)
-        gameover()
     if(board['2_0'] == 0 and board['2_1'] == 0 and board['2_2'] == 0):
         end_message = 'O Won!'
-        pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_d+(line_c*0.5-screen_y*0.0425))), (int(screen_x-screen_x*0.25),int(line_d+(line_c*0.5-screen_y*0.0425))), 9)
-        gameover()
+        game_end = True
+        pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_d+(line_c*0.5-screen_y*0.0425))), (int(screen_x-screen_x*0.025),int(line_d+(line_c*0.5-screen_y*0.0425))), 9)
     if(board['0_0'] == 0 and board['1_0'] == 0 and board['2_0'] == 0):
         end_message = 'O Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(line_a*0.5+screen_x*0.001),int((0+(screen_y*0.08)+screen_y*0.01))), (int(line_a*0.5+screen_x*0.001),int(screen_y-screen_y*0.01)), 9)
-        gameover()
     if(board['0_1'] == 0 and board['1_1'] == 0 and board['2_1'] == 0):
         end_message = 'O Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(line_a*0.5+line_a+screen_x*0.001),int((0+(screen_y*0.08)+screen_y*0.01))), (int(line_a*0.5+line_a+screen_x*0.001),int(screen_y-screen_y*0.01)), 9)
-        gameover()
     if(board['0_2'] == 0 and board['1_2'] == 0 and board['2_2'] == 0):
         end_message = 'O Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(line_a*0.5+line_b+screen_x*0.001),int((0+(screen_y*0.08)+screen_y*0.01))), (int(line_a*0.5+line_b+screen_x*0.001),int(screen_y-screen_y*0.01)), 9)#start
-        gameover()
-        
+        game_end = True
     if(board['0_0'] == 0 and board['1_1'] == 0 and board['2_2'] == 0):
         end_message = 'O Won!'
         x1 = int((((0+screen_x*0.015)+(line_a*0.5))/2)-screen_x*0.05)
@@ -239,7 +252,7 @@ def win_lines(board):
             pygame.draw.aaline(screen, red, (x1,y1+i),(x2,y2+i))
             pygame.draw.aaline(screen, red, (x1-i,y1),(x2-i,y2))
             pygame.draw.aaline(screen, red, (x1,y1-i),(x2,y2-i))
-        gameover()
+            game_end = True
     if(board['0_2'] == 0 and board['1_1'] == 0 and board['2_0'] == 0):
         end_message = 'O Won!'
         x1 = int((((screen_x-screen_x*0.015)+(line_a*0.5+line_b))/2)+screen_x*0.05)
@@ -251,34 +264,35 @@ def win_lines(board):
             pygame.draw.aaline(screen, red, (x1,y1+i),(x2,y2+i))
             pygame.draw.aaline(screen, red, (x1-i,y1),(x2-i,y2))
             pygame.draw.aaline(screen, red, (x1,y1-i),(x2,y2-i))
-        gameover()
+            game_end = True
     #x win
     if(board['0_0'] == 1 and board['0_1'] == 1 and board['0_2'] == 1):
         end_message = 'X Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_c*0.5+screen_y*0.0375)), (int(screen_x-screen_x*0.025),int(line_c*0.5+screen_y*0.0375)), 9)
-        gameover()
     if(board['1_0'] == 1 and board['1_1'] == 1 and board['1_2'] == 1):
         end_message = 'X Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_c+(line_c*0.5-screen_y*0.0425))), (int(screen_x-screen_x*0.025),int(line_c+(line_c*0.5-screen_y*0.0425))), 9)
-        gameover()
     if(board['2_0'] == 1 and board['2_1'] == 1 and board['2_2'] == 1):
         end_message = 'X Won!'
-        pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_d+(line_c*0.5-screen_y*0.0425))), (int(screen_x-screen_x*0.25),int(line_d+(line_c*0.5-screen_y*0.0425))), 9)
-        gameover()
+        game_end = True
+        pygame.draw.line(screen,red,(int(0+screen_x*0.025),int(line_d+(line_c*0.5-screen_y*0.0425))), (int(screen_x-screen_x*0.025),int(line_d+(line_c*0.5-screen_y*0.0425))), 9)
     if(board['0_0'] == 1 and board['1_0'] == 1 and board['2_0'] == 1):
         end_message = 'X Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(line_a*0.5+screen_x*0.001),int((0+(screen_y*0.08)+screen_y*0.01))), (int(line_a*0.5+screen_x*0.001),int(screen_y-screen_y*0.01)), 9)
-        gameover()
     if(board['0_1'] == 1 and board['1_1'] == 1 and board['2_1'] == 1):
         end_message = 'X Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(line_a*0.5+line_a+screen_x*0.001),int((0+(screen_y*0.08)+screen_y*0.01))), (int(line_a*0.5+line_a+screen_x*0.001),int(screen_y-screen_y*0.01)), 9)
-        gameover()
     if(board['0_2'] == 1 and board['1_2'] == 1 and board['2_2'] == 1):
         end_message = 'X Won!'
+        game_end = True
         pygame.draw.line(screen,red,(int(line_a*0.5+line_b+screen_x*0.001),int((0+(screen_y*0.08)+screen_y*0.01))), (int(line_a*0.5+line_b+screen_x*0.001),int(screen_y-screen_y*0.01)), 9)#start
-        gameover()
     if(board['0_0'] == 1 and board['1_1'] == 1 and board['2_2'] == 1):
         end_message = 'X Won!'
+        game_end = True
         x1 = int((((0+screen_x*0.015)+(line_a*0.5))/2)-screen_x*0.05)
         y1 = int((((line_c*0.5+screen_y*0.04)+(0+(screen_y*0.08)+screen_y*0.015))/2)-screen_y*0.0475)
         x2 = int((((screen_x-screen_x*0.015)+(line_a*0.5+line_b))/2)+screen_x*0.05)
@@ -288,7 +302,7 @@ def win_lines(board):
             pygame.draw.aaline(screen, red, (x1,y1+i),(x2,y2+i))
             pygame.draw.aaline(screen, red, (x1-i,y1),(x2-i,y2))
             pygame.draw.aaline(screen, red, (x1,y1-i),(x2,y2-i))
-        gameover()
+            game_end = True
     if(board['0_2'] == 1 and board['1_1'] == 1 and board['2_0'] == 1):
         end_message = 'X Won!'
         x1 = int((((screen_x-screen_x*0.015)+(line_a*0.5+line_b))/2)+screen_x*0.05)
@@ -300,11 +314,18 @@ def win_lines(board):
             pygame.draw.aaline(screen, red, (x1,y1+i),(x2,y2+i))
             pygame.draw.aaline(screen, red, (x1-i,y1),(x2-i,y2))
             pygame.draw.aaline(screen, red, (x1,y1-i),(x2,y2-i))
+            game_end = True
+    if end_message != None and single_player == True:
+        if player_symbol == 0 and end_message == 'O Won!':
+            end_message = 'You Won!'
+        elif player_symbol == 1 and end_message == 'X Won!':
+            end_message = 'You Won!'
+        else:
+            end_message = 'You Lost'
+    if game_end == True:
         gameover()
 def gameover():
     global board, menu_wait, goal_ticks, game_end, end_message, box_click, end_option, draw, menu, start, single_player, multi_player
-    if(game_end == False):
-        game_end = True
     info_box()
     if screen_x < screen_y: 
         smallest_screen_value = screen_x
@@ -347,14 +368,9 @@ def gameover():
         if draw == True:
             draw = False
         board = reset_board()
-        
-def wait(goal_ticks):
-    wait_completed = False
-    if ticks >= goal_ticks:
-        wait_completed = True
-    return wait_completed
 
 pygame.init()
+
 
 screen_size = width, height = 500, 500
 black = (0, 0, 0)
@@ -396,6 +412,9 @@ multi_player = False
 end_option = None
 game_end = False
 draw = False
+player_turn = False
+player_symbol = 0
+difficulty = 0
 while running:
     ticks = pygame.time.get_ticks()
     screen.fill(background)
@@ -412,9 +431,17 @@ while running:
             lines.append(globals()['line_'+line_letters[i]])
         info_box()
         board_setup(lines)
-        if box_click == True and game_end == False:
+        if player_symbol == turn and single_player == True:
+            player_turn = True
+        elif multi_player == True:
+            player_turn = True
+        if box_click == True and game_end == False and player_turn == True:
             board = board_modification(board, mouse_position, lines)
             box_click = False
+            player_turn = False
+        elif single_player == True and game_end == False and player_turn == False:
+            board = bot_move(board, player_symbol, difficulty)
+            turn = turn_move(turn)
         if line_a < line_c:
             line  = line_a
         else:
@@ -448,6 +475,7 @@ while running:
         if menu == True:
             if event.type == MOUSEBUTTONUP:
                 mouse_position = pygame.mouse.get_pos()
+                click = True
         if start == True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_g:
@@ -457,6 +485,19 @@ while running:
                 elif event.key == pygame.K_r:
                     board = reset_board()
                     turn = randint(0, 1)
+                elif event.key == pygame.K_ESCAPE:
+                    single_player = False
+                    multi_player = False
+                    end_message = None
+                    end_option = None
+                    game_end = False
+                    box_click = False
+                    player_turn = False
+                    if draw == True:
+                        draw = False
+                    menu = True
+                    start = False
+                    board = reset_board()
             elif event.type == MOUSEBUTTONUP:
                 mouse_position = pygame.mouse.get_pos()
                 box_click = True
