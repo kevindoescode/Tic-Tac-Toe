@@ -1,7 +1,6 @@
 import pygame
 from bot import bot_move
 from pygame.locals import VIDEORESIZE, RESIZABLE, MOUSEBUTTONUP
-import pygame.gfxdraw
 from random import randint
 
 
@@ -756,7 +755,6 @@ screen.fill(background)
 pygame.display.update()
 x_img_int = pygame.image.load("X.png")
 o_img_int = pygame.image.load("O.png")
-
 
 running = True
 debug = True
