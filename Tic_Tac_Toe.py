@@ -1,4 +1,4 @@
-import sys, pygame, random
+import sys, pygame, random, time, os
 from bot import bot_move
 from pygame.locals import *
 import pygame.gfxdraw
@@ -183,7 +183,7 @@ def info_box():
     text_box.center = (int(screen_x*0.5),int(screen_y*0.040))
     screen.blit(text, text_box)
 def menu_screen():
-    global menu, start, single_player, multi_player, click
+    global menu, start, single_player, multi_player, click, player_symbol, difficulty, turn
     start = False
     if screen_x < screen_y: 
         smallest_screen_value = screen_x
@@ -211,9 +211,48 @@ def menu_screen():
     if single_player == True:
         menu = False
         start = True
+        turn = randint(0, 1)
     if multi_player == True:
         menu = False
         start = True
+        turn = randint(0, 1)
+    font = pygame.font.SysFont('Calibri', int(smallest_screen_value*0.06))
+    text_rectangle_2 = pygame.draw.rect(screen, black, (int(screen_x*0.115),int(screen_y*0.88),int(screen_x*0.27),int(screen_y*0.125)))
+    if player_symbol == 0:
+        text_2 = font.render('Symbol: O', True, white, black)
+    if player_symbol == 1:
+        text_2 = font.render('Symbol: X', True, white, black)
+    text_box_2 = text_2.get_rect()
+    text_box_2.center = (int(screen_x*0.25),int(screen_y*0.94))
+    screen.blit(text_2, text_box_2)
+    if text_rectangle_2.collidepoint(mouse_position) and click == True:
+        if player_symbol == 0:
+            player_symbol = 1
+            click = False
+        elif player_symbol == 1:
+            player_symbol = 0
+            click = False
+    font = pygame.font.SysFont('Calibri', int(smallest_screen_value*0.08))
+    text_rectangle_3 = pygame.draw.rect(screen, black, (int(screen_x*0.625),int(screen_y*0.88),int(screen_x*0.25),int(screen_y*0.125)))
+    if difficulty == 0:
+        text_3 = font.render('Easy', True, white, black)
+    if difficulty == 1:
+        text_3 = font.render('Normal', True, white, black)
+    if difficulty == 2:
+        text_3 = font.render('Hard', True, white, black)
+    text_box_3 = text_3.get_rect()
+    text_box_3.center = (int(screen_x*0.75),int(screen_y*0.94))
+    screen.blit(text_3, text_box_3)
+    if text_rectangle_3.collidepoint(mouse_position) and click == True:
+        if difficulty == 0:
+            difficulty = 1
+            click = False
+        elif difficulty == 1:
+            difficulty = 2
+            click = False
+        elif difficulty == 2:
+            difficulty = 0
+            click = False
 def win_lines(board):
     global end_message, player_symbol, game_end
     if(board['0_0'] == 0 and board['0_1'] == 0 and board['0_2'] == 0):
@@ -343,11 +382,11 @@ def gameover():
     text_box_1 = text_1.get_rect()
     text_box_1.center = (int(screen_x*0.5),int(screen_y*0.7))
     screen.blit(text_1, text_box_1)
-
-    if text_rectangle_0.collidepoint(mouse_position):
-        end_option = 'continue'
-    elif text_rectangle_1.collidepoint(mouse_position):
-        end_option = 'mainmenu'
+    if(box_click == True):
+        if text_rectangle_0.collidepoint(mouse_position):
+            end_option = 'continue'
+        elif text_rectangle_1.collidepoint(mouse_position):
+            end_option = 'mainmenu'
     if end_option == 'continue':
         end_message = None
         board = reset_board()
@@ -368,6 +407,10 @@ def gameover():
         if draw == True:
             draw = False
         board = reset_board()
+def save_settings(player_symbol, difficulty):
+    with open(r'./settings.ini', 'w') as settings_file:
+        settings = 'Player symbol = ' + str(player_symbol) + '\nDifficulty = ' + str(difficulty)
+        settings_file.write(settings)
 
 pygame.init()
 
@@ -415,6 +458,20 @@ draw = False
 player_turn = False
 player_symbol = 0
 difficulty = 0
+try:
+    with open(r'./settings.ini', 'r') as settings_file:
+        settings_data = settings_file.read().split('\n')
+        settings_data_0 = settings_data[0].split(' = ')
+        settings_data_1 = settings_data[1].split(' = ')
+        settings = [str(settings_data_0[0].replace(' ', '_').lower()), str(settings_data_1[0].replace(' ', '_').lower())]
+        i = 0
+        for setting in settings:
+            globals()[setting] = int(globals()['settings_data_' +str(i)][1])
+            i+=1
+        del i
+except:
+    with open(r'./settings.ini', 'w') as settings_file:
+        save_settings(player_symbol, difficulty)
 while running:
     ticks = pygame.time.get_ticks()
     screen.fill(background)
@@ -455,6 +512,7 @@ while running:
         if not(any(n is None for n in board.values())) and game_end == False:
             draw = True
         if draw == True:
+            game_end = True
             end_message = 'It\'s a Draw'
             gameover()
 
@@ -464,7 +522,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        print(event)
+            save_settings(player_symbol, difficulty)
+        #print(event)
         pygame.display.set_caption('Tic Tac Toe')
         
         if event.type == VIDEORESIZE:
