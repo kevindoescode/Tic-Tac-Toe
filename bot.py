@@ -1,4 +1,6 @@
 import random
+
+
 def bot_move(board, player_symbol, difficulty):
     if player_symbol == 0:
         bot_symbol = 1
@@ -8,7 +10,7 @@ def bot_move(board, player_symbol, difficulty):
         board_values = list(board.keys())
         random.shuffle(board_values)
         for i in board_values:
-            if board[i] == None:
+            if board[i] is None:
                 board[i] = bot_symbol
                 break
     if difficulty == 1:
@@ -27,112 +29,112 @@ def bot_move(board, player_symbol, difficulty):
         if True:
             move_possible = 0
             move_impossible = False
-            for i in range(0,3):
-                if board_positions[i] == True:
+            for i in range(0, 3):
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in range(0,3):
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in range(0, 3):
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
         if True:
             move_possible = 0
             move_impossible = False
-            for i in range(3,6):
-                if board_positions[i] == True:
+            for i in range(3, 6):
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in range(3,6):
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in range(3, 6):
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
         if True:
             move_possible = 0
             move_impossible = False
-            for i in range(6,9):
-                if board_positions[i] == True:
+            for i in range(6, 9):
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in range(6,9):
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in range(6, 9):
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
         if True:
             move_possible = 0
             move_impossible = False
-            for i in [0,3,6]:
-                if board_positions[i] == True:
+            for i in [0, 3, 6]:
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in [0,3,6]:
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in [0, 3, 6]:
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
         if True:
             move_possible = 0
             move_impossible = False
-            for i in [1,4,7]:
-                if board_positions[i] == True:
+            for i in [1, 4, 7]:
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in [1,4,7]:
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in [1, 4, 7]:
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
         if True:
             move_possible = 0
             move_impossible = False
-            for i in [2,6,8]:
-                if board_positions[i] == True:
+            for i in [2, 6, 8]:
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in [2,6,8]:
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in [2, 6, 8]:
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
         if True:
             move_possible = 0
             move_impossible = False
-            for i in [0,4,8]:
-                if board_positions[i] == True:
+            for i in [0, 4, 8]:
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in [0,4,8]:
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in [0, 4, 8]:
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
         if True:
             move_possible = 0
             move_impossible = False
-            for i in [2,4,6]:
-                if board_positions[i] == True:
+            for i in [2, 4, 6]:
+                if board_positions[i] is True:
                     move_possible += 1
-                if board_positions[i] == False:
+                if board_positions[i] is False:
                     move_impossible = True
-            if move_possible == 2 and move_impossible == False:
-                for i in [2,4,6]:
-                    if board_values[i] == None:
+            if move_possible == 2 and move_impossible is False:
+                for i in [2, 4, 6]:
+                    if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
 
-        if move_executed == False:
+        if move_executed is False:
             random.shuffle(board_keys)
             for i in board_keys:
-                if board[i] == None:
+                if board[i] is None:
                     board[i] = bot_symbol
                     break
     return board
