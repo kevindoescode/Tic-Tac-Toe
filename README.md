@@ -2,7 +2,8 @@
 
 A Simple Tic Tac Toe game.<br/>
 
-Features:<br/>
+## Features
+
 Single player/Multi Player<br/>
 Change your symbol for single player<br/>
 Change the difficulty for single player<br/>
