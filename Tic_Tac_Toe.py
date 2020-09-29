@@ -836,9 +836,6 @@ try:
             else:
                 globals()[setting] = eval(globals()["settings_data_" + str(i)][1])
             i += 1
-        print(player_symbol)
-        print(difficulty)
-        print(background)
         del i
 except FileNotFoundError:
     with open(r"./settings.ini", "w") as settings_file:

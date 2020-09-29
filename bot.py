@@ -26,7 +26,7 @@ def bot_move(board, player_symbol, difficulty):
             else:
                 position_yes = None
             board_positions.append(position_yes)
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in range(0, 3):
@@ -39,7 +39,7 @@ def bot_move(board, player_symbol, difficulty):
                     if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in range(3, 6):
@@ -52,7 +52,7 @@ def bot_move(board, player_symbol, difficulty):
                     if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in range(6, 9):
@@ -65,7 +65,7 @@ def bot_move(board, player_symbol, difficulty):
                     if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in [0, 3, 6]:
@@ -78,7 +78,7 @@ def bot_move(board, player_symbol, difficulty):
                     if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in [1, 4, 7]:
@@ -91,7 +91,7 @@ def bot_move(board, player_symbol, difficulty):
                     if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in [2, 6, 8]:
@@ -104,7 +104,7 @@ def bot_move(board, player_symbol, difficulty):
                     if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in [0, 4, 8]:
@@ -117,7 +117,7 @@ def bot_move(board, player_symbol, difficulty):
                     if board_values[i] is None:
                         board[board_keys[i]] = bot_symbol
                         move_executed = True
-        if True:
+        if move_executed is False:
             move_possible = 0
             move_impossible = False
             for i in [2, 4, 6]:
@@ -136,5 +136,6 @@ def bot_move(board, player_symbol, difficulty):
             for i in board_keys:
                 if board[i] is None:
                     board[i] = bot_symbol
+                    move_executed = True
                     break
     return board
