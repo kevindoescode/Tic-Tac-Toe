@@ -323,7 +323,7 @@ def info_box():
 
 def menu_screen():
     global menu, start, single_player, multi_player, click
-    global player_symbol, difficulty, turn
+    global player_symbol, difficulty, turn, background
     start = False
     if screen_x < screen_y:
         smallest_screen_value = screen_x
@@ -404,9 +404,9 @@ def menu_screen():
         screen,
         BLACK,
         (
-            int(screen_x * 0.625),
+            int(screen_x * 0.615),
             int(screen_y * 0.88),
-            int(screen_x * 0.25),
+            int(screen_x * 0.27),
             int(screen_y * 0.125),
         ),
     )
@@ -429,6 +429,37 @@ def menu_screen():
         elif difficulty == 2:
             difficulty = 0
             click = False
+    text_rectangle_4 = pygame.draw.rect(
+        screen,
+        BLACK,
+        (
+            int(screen_x * 0.40),
+            int(screen_y * 0.88),
+            int(screen_x * 0.20),
+            int(screen_y * 0.1225),
+        ),
+    )
+    font = pygame.font.SysFont("Calibri", int(smallest_screen_value * 0.08))
+    text_4 = font.render("Color", True, background, BLACK)
+    text_box_4 = text_4.get_rect()
+    text_box_4.center = (int(screen_x * 0.50), int(screen_y * 0.94))
+    screen.blit(text_4, text_box_4)
+    if text_rectangle_4.collidepoint(mouse_position) and click is True:
+        if background == WHITE:
+            background = GRAY
+        elif background == GRAY:
+            background = GOLD
+        elif background == GOLD:
+            background = GREEN
+        elif background == GREEN:
+            background = BLUE
+        elif background == BLUE:
+            background = ORCHID
+        elif background == ORCHID:
+            background = WHITE
+        else:
+            background = WHITE
+        click = False
 
 
 def win_lines(board):
@@ -727,13 +758,15 @@ def gameover():
         board = reset_board()
 
 
-def save_settings(player_symbol, difficulty):
+def save_settings(player_symbol, difficulty, background):
     with open(r"./settings.ini", "w") as settings_file:
         settings = (
             "Player symbol = "
             + str(player_symbol)
             + "\nDifficulty = "
             + str(difficulty)
+            + "\nBackground = "
+            + str(background)
         )
         settings_file.write(settings)
 
@@ -748,6 +781,8 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 GRAY = (105, 105, 105)
+GOLD = (255, 215, 0)
+ORCHID = (218, 112, 214)
 screen = pygame.display.set_mode(screen_size, RESIZABLE)
 
 background = WHITE
@@ -788,18 +823,26 @@ try:
         settings_data = settings_file.read().split("\n")
         settings_data_0 = settings_data[0].split(" = ")
         settings_data_1 = settings_data[1].split(" = ")
+        settings_data_2 = settings_data[2].split(" = ")
         settings = [
             str(settings_data_0[0].replace(" ", "_").lower()),
             str(settings_data_1[0].replace(" ", "_").lower()),
+            str(settings_data_2[0].replace(" ", "_").lower()),
         ]
         i = 0
         for setting in settings:
-            globals()[setting] = int(globals()["settings_data_" + str(i)][1])
+            if (globals()["settings_data_" + str(i)][1]).isdigit():
+                globals()[setting] = int(globals()["settings_data_" + str(i)][1])
+            else:
+                globals()[setting] = eval(globals()["settings_data_" + str(i)][1])
             i += 1
+        print(player_symbol)
+        print(difficulty)
+        print(background)
         del i
 except FileNotFoundError:
     with open(r"./settings.ini", "w") as settings_file:
-        save_settings(player_symbol, difficulty)
+        save_settings(player_symbol, difficulty, background)
 while running:
     ticks = pygame.time.get_ticks()
     screen.fill(background)
@@ -856,7 +899,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            save_settings(player_symbol, difficulty)
+            save_settings(player_symbol, difficulty, background)
         # print(event)
         pygame.display.set_caption("Tic Tac Toe")
 
